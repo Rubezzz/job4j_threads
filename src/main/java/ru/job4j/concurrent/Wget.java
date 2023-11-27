@@ -16,25 +16,41 @@ public class Wget implements Runnable {
         this.limit = speed;
     }
 
+    private String getFileName() {
+        String[] split = url.split("/");
+        return split[split.length - 1];
+    }
+
+    private void sleep(long sleepTime) {
+        if (sleepTime > 0) {
+            try {
+                Thread.sleep(sleepTime);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }
+    }
+
     @Override
     public void run() {
-        var file = new File("tmp.txt");
+        var file = new File(getFileName());
         try (var in = new URL(url).openStream();
              var out = new FileOutputStream(file)) {
-            var dataBuffer = new byte[512];
+            var dataBuffer = new byte[128];
             int bytesRead;
+            int countBytes = 0;
+            var downloadAt = System.currentTimeMillis();
             while ((bytesRead = in.read(dataBuffer, 0, dataBuffer.length)) != -1) {
-                var downloadAt = System.nanoTime();
                 out.write(dataBuffer, 0, bytesRead);
-                long downloadTime = System.nanoTime() - downloadAt;
-                long speed = (long) (512D / downloadTime * 1_000_000);
-                if (limit < speed) {
-                    long sleep = speed / limit;
-                    try {
-                        Thread.sleep(sleep);
-                    } catch (InterruptedException e) {
-                        Thread.currentThread().interrupt();
+                countBytes += bytesRead;
+                if (countBytes >= limit) {
+                    long elapsedTime = System.currentTimeMillis() - downloadAt;
+                    long sleepTime = 1000 - elapsedTime;
+                    if (sleepTime > 0) {
+                        sleep(sleepTime);
                     }
+                    downloadAt = System.currentTimeMillis();
+                    countBytes = 0;
                 }
             }
         } catch (IOException e) {
