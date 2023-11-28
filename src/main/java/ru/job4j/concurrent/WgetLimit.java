@@ -6,12 +6,12 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-public class Wget implements Runnable {
+public class WgetLimit implements Runnable {
 
     private final String url;
     private final int limit;
 
-    public Wget(String url, int speed) {
+    public WgetLimit(String url, int speed) {
         this.url = url;
         this.limit = speed;
     }
@@ -76,7 +76,7 @@ public class Wget implements Runnable {
         validate(args);
         String url = args[0];
         int speed = Integer.parseInt(args[1]);
-        Thread wget = new Thread(new Wget(url, speed));
+        Thread wget = new Thread(new WgetLimit(url, speed));
         wget.start();
         wget.join();
     }
