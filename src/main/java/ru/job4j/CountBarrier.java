@@ -27,7 +27,7 @@ public class CountBarrier {
 
     public void await() {
         synchronized (monitor) {
-            while (count >= total) {
+            while (count <= total) {
                 try {
                     monitor.wait();
                 } catch (InterruptedException e) {
@@ -40,10 +40,14 @@ public class CountBarrier {
     public static void main(String[] args) {
         CountBarrier countBarrier = new CountBarrier(10);
         Thread first = new Thread(() -> {
-            for (int i = 0; i < 10; i++) {
-                countBarrier.await();
+            for (int i = 0; i < 20; i++) {
                 countBarrier.count();
                 System.out.printf("First thread work. Count = %s%n", countBarrier.getCount());
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
             }
         });
         Thread second = new Thread(() -> {
@@ -51,9 +55,27 @@ public class CountBarrier {
                 countBarrier.await();
                 countBarrier.count();
                 System.out.printf("Second thread work. Count = %s%n", countBarrier.getCount());
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+            }
+        });
+        Thread third = new Thread(() -> {
+            for (int i = 0; i < 10; i++) {
+                countBarrier.await();
+                countBarrier.count();
+                System.out.printf("third thread work. Count = %s%n", countBarrier.getCount());
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
             }
         });
         first.start();
         second.start();
+        third.start();
     }
 }
