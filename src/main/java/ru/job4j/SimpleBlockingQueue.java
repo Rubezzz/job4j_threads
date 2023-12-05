@@ -29,7 +29,8 @@ public class SimpleBlockingQueue<T> {
         if (queue.isEmpty()) {
             wait();
         }
+        T result = queue.poll();
         this.notifyAll();
-        return queue.poll();
+        return result;
     }
 }
