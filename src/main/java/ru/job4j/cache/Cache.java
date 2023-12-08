@@ -1,11 +1,9 @@
 package ru.job4j.cache;
 
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiFunction;
-import java.util.stream.Stream;
 
 public class Cache {
     private final Map<Integer, Base> memory = new ConcurrentHashMap<>();
@@ -29,8 +27,6 @@ public class Cache {
     }
 
     public Optional<Base> findById(int id) {
-        return Stream.of(memory.get(id))
-                .filter(Objects::nonNull)
-                .findFirst();
+        return Optional.ofNullable(memory.get(id));
     }
 }
