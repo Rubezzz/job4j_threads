@@ -20,7 +20,10 @@ public class ThreadPool {
             Thread thread = new Thread(() -> {
                 while (!Thread.currentThread().isInterrupted()) {
                     try {
-                        tasks.poll();
+                        Runnable task = tasks.poll();
+                        if (task != null) {
+                            task.run();
+                        }
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                         Thread.currentThread().interrupt();
@@ -38,5 +41,15 @@ public class ThreadPool {
 
     public void shutdown() {
         threads.forEach(Thread::interrupt);
+    }
+
+    public static void main(String[] args) throws InterruptedException {
+        ThreadPool pool = new ThreadPool();
+        pool.work(() -> System.out.println("Task #1 started."));
+        pool.work(() -> System.out.println("Task #2 started."));
+        pool.work(() -> System.out.println("Task #3 started."));
+        pool.work(() -> System.out.println("Task #4 started."));
+        pool.work(() -> System.out.println("Task #5 started."));
+        pool.shutdown();
     }
 }
