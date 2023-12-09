@@ -20,10 +20,7 @@ public class ThreadPool {
             Thread thread = new Thread(() -> {
                 while (!Thread.currentThread().isInterrupted()) {
                     try {
-                        Runnable task = tasks.poll();
-                        if (task != null) {
-                            task.run();
-                        }
+                        tasks.poll().run();
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                         Thread.currentThread().interrupt();
