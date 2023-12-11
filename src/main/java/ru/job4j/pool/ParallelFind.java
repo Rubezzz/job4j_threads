@@ -1,46 +1,52 @@
 package ru.job4j.pool;
 
+import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.RecursiveTask;
 
-public class ParallelFind extends RecursiveTask<Integer> {
+public class ParallelFind<T> extends RecursiveTask<Integer> {
 
-    private final Object[] array;
+    private final T[] array;
     private final int from;
     private final int to;
-    private final Object element;
+    private final T element;
 
-    public ParallelFind(Object[] array, int from, int to, Object element) {
-        if (!array[0].getClass().equals(element.getClass())) {
-            throw new IllegalArgumentException("Invalid data type \"element\"");
-        }
+    public ParallelFind(T[] array, int from, int to, T element) {
         this.array = array;
         this.from = from;
         this.to = to;
         this.element = element;
     }
 
+    private int findIndex() {
+        int index = -1;
+        for (int i = from; i <= to; i++) {
+            if (array[i].equals(element)) {
+                index = i;
+                break;
+            }
+        }
+        return index;
+    }
+
     @Override
     protected Integer compute() {
         if (to - from <= 10) {
-            int index = -1;
-            for (int i = 0; i < array.length; i++) {
-                if (array[i].equals(element)) {
-                    index = i;
-                    break;
-                }
-            }
-            return index;
+            return findIndex();
         }
         int mid = (from + to) / 2;
-        RecursiveTask<Integer> left = new ParallelFind(array, from, mid, element);
-        RecursiveTask<Integer> right = new ParallelFind(array, from, mid, element);
+        ParallelFind<T> left = new ParallelFind<>(array, from, mid, element);
+        ParallelFind<T> right = new ParallelFind<>(array, mid, to, element);
         left.fork();
         right.fork();
-        int leftResult = left.join();
-        int rightResult = right.join();
-        if (leftResult != -1) {
-            return leftResult;
+        return Math.max(left.join(), right.join());
+    }
+
+    public static <E> int find(E[] array, E element) {
+        if (!array[0].getClass().equals(element.getClass())) {
+            throw new IllegalArgumentException("Invalid data type \"element\"");
         }
-        return rightResult;
+        ParallelFind<E> find = new ParallelFind<>(array, 0, array.length - 1, element);
+        ForkJoinPool forkJoinPool = new ForkJoinPool();
+        return forkJoinPool.invoke(find);
     }
 }
