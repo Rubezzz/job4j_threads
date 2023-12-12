@@ -42,9 +42,6 @@ public class ParallelFind<T> extends RecursiveTask<Integer> {
     }
 
     public static <E> int find(E[] array, E element) {
-        if (!array[0].getClass().equals(element.getClass())) {
-            throw new IllegalArgumentException("Invalid data type \"element\"");
-        }
         ParallelFind<E> find = new ParallelFind<>(array, 0, array.length - 1, element);
         ForkJoinPool forkJoinPool = new ForkJoinPool();
         return forkJoinPool.invoke(find);

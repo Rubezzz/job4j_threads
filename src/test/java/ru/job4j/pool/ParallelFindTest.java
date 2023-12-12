@@ -2,6 +2,8 @@ package ru.job4j.pool;
 
 import org.junit.jupiter.api.Test;
 
+import java.util.LinkedList;
+
 import static org.assertj.core.api.Assertions.*;
 
 class ParallelFindTest {
@@ -43,13 +45,26 @@ class ParallelFindTest {
     }
 
     @Test
-    void whenElementInvalidTypeThenException() {
+    void whenElementIsOtherTypeThenMinus1() {
+        Object[] array = new Object[3];
+        array[0] = "string";
+        array[1] = 10;
+        array[2] = new LinkedList<>();
+        Double found = 5d;
+        int expected = -1;
+        int result = ParallelFind.find(array, found);
+        assertThat(result).isEqualTo(expected);
+    }
+
+    @Test
+    void whenElementIsOtherTypeThenMinus1Version2() {
         String[] array = new String[10_000];
         for (int i = 0; i < array.length; i++) {
             array[i] = "String - " + i;
         }
-        Integer found = 99;
-        assertThatThrownBy(() -> ParallelFind.find(array, found))
-                .isInstanceOf(IllegalArgumentException.class);
+        Double found = 5d;
+        int expected = -1;
+        int result = ParallelFind.find(array, found);
+        assertThat(result).isEqualTo(expected);
     }
 }
