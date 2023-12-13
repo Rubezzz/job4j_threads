@@ -14,11 +14,11 @@ class RolColSumTest {
             {2, 6, 4, 2},
             {5, 3, 4, 5}
     };
-    private final RolColSum.Sums[] expected = {
-            new RolColSum.Sums(7, 11),
-            new RolColSum.Sums(19, 16),
-            new RolColSum.Sums(14, 20),
-            new RolColSum.Sums(17, 10),
+    private final Sums[] expected = {
+            new Sums(7, 11),
+            new Sums(19, 16),
+            new Sums(14, 20),
+            new Sums(17, 10),
     };
 
     @Test
